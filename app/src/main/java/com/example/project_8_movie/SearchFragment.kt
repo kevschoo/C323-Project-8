@@ -108,25 +108,18 @@ class SearchFragment : Fragment()
     /**
      * Composes and starts an email intent for sending feedback.
      */
-    private fun sendFeedbackEmail()
-    {
-        val mailto = "mailto:kevschoo@iu.edu" +
-                "?subject=" + Uri.encode("Feedback")
-
-        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse(mailto)
-            setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail")
+    private fun sendFeedbackEmail() {
+        val emailIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "message/rfc822"
+            putExtra(Intent.EXTRA_EMAIL, arrayOf("kevschoo@iu.edu"))
+            putExtra(Intent.EXTRA_SUBJECT, "Feedback")
+            putExtra(Intent.EXTRA_TEXT, "Enter your feedback here...")
         }
 
         try {
-            startActivity(emailIntent)
-        }
-        catch (e: Exception)
-        {
-            val fallbackEmailIntent = Intent(Intent.ACTION_SENDTO).apply {data = Uri.parse(mailto) }
-            if (fallbackEmailIntent.resolveActivity(requireActivity().packageManager) != null)
-            {startActivity(fallbackEmailIntent)}
-            else {Toast.makeText(context, "No email app found", Toast.LENGTH_SHORT).show() }
+            startActivity(Intent.createChooser(emailIntent, "Send email using..."))
+        } catch (e: Exception) {
+            Toast.makeText(context, "No email app found", Toast.LENGTH_SHORT).show()
         }
     }
 
